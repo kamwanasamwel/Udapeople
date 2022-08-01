@@ -239,6 +239,9 @@ jobs:
               echo "No migrations are pending"
             fi
      # Here's where you will add some code to rollback on failure      
+      - destroy-environment
+      - revert-migrations
+      - cleanup
 
   deploy-frontend:
     docker:
