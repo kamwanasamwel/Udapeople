@@ -239,18 +239,12 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - install_awscli
-      # - restore_cache:
-      #     keys: [backend-build]
+      # - install_awscli
       - run:
           name: Run migrations
           command: |
-            cd backend
+            cd ~/project/backend
             npm install
-            # npm audit fix --audit-level=critical
-            npm audit fix --force
-            # Run and save the migration output
-            npm run premigrations
             npm run migrations > migrations_dump.txt
       - run:
           name: Send migration results to kvd.io
