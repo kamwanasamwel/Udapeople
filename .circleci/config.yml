@@ -240,13 +240,12 @@ jobs:
     steps:
       - checkout
       - install_awscli
-      - restore_cache:
-          keys: [backend-build]
+      - attach_workspace:
+          at: ~/
       - run:
           command: |
             cd backend
             npm i
-            npm audit fix --audit-level=critical --force
             npm run migrations > migrations_dump.txt
       - run:
           name: Send migration results to kvd.io
