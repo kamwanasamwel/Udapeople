@@ -240,8 +240,6 @@ jobs:
     steps:
       - checkout
       - install_awscli
-      - attach_workspace:
-          at: ~/
       - run:
           command: |
             cd backend
