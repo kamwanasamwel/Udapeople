@@ -158,23 +158,48 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-test
+  # scan-backend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [backend-build]
+  #     - run:
+  #         command: |
+  #           cd backend
+  #           npm i
+  #           npm audit fix --audit-level=critical --force
+  #           npm audit fix --audit-level=critical --force
+  #           npm audit --audit-level=critical
+  #     - save_cache:
+  #         paths: [backend/node_modules]
+  #         key: backend-scan
   scan-backend:
     docker:
+        # Docker image here
       - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
+      # Restore from cache
+      
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-test]
+      # Your job code here
       - run:
+          name: Scan-Backend
           command: |
+            # Your code here
             cd backend
-            npm i
+            npm install
+            # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-test
+          key: backend-scan
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
