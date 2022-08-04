@@ -121,9 +121,9 @@ jobs:
             cd frontend
             npm install
             npm run test
-      # - save_cache:
-      #     paths: [frontend/node_modules]
-      #     key: frontend-test
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-test
                
   test-backend:
     docker:
@@ -138,9 +138,9 @@ jobs:
             cd backend
             npm install
             npm run test
-      # - save_cache:
-      #     paths: [backend/node_modules]
-      #     key: backend-test
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-test
             
   scan-frontend:
     docker:
@@ -155,6 +155,9 @@ jobs:
             npm i
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-test
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -168,6 +171,9 @@ jobs:
             npm i
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-test
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
