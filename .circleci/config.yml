@@ -252,10 +252,10 @@ jobs:
             - "9f:1d:37:d0:73:33:e4:24:41:ad:fd:1b:3e:89:66:cc"
       - attach_workspace:
           at: ~/
-      - install_awscli
       - run:
           name: Install dependencies
           command: |
+            pip install awscli
             apk add --update ansible
       - run:
           name: Configure Server
