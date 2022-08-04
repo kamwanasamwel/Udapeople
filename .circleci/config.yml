@@ -8,6 +8,7 @@ commands:
         type: string
         default: ${CIRCLE_WORKFLOW_ID:0:7} 
     steps:
+      - install_awscli
       - run:
           name: Destroy environments
           when: on_fail
@@ -177,23 +178,16 @@ jobs:
   #         key: backend-scan
   scan-backend:
     docker:
-        # Docker image here
       - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
-      
       - restore_cache:
           keys: [backend-test]
-      # Your job code here
       - run:
           name: Scan-Backend
           command: |
-            # Your code here
             cd backend
             npm install
-            # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
@@ -250,14 +244,18 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      # - add_ssh_keys:
+      #     fingerprints: ["9f:1d:37:d0:73:33:e4:24:41:ad:fd:1b:3e:89:66:cc"]
+
       - add_ssh_keys:
-          fingerprints: ["9f:1d:37:d0:73:33:e4:24:41:ad:fd:1b:3e:89:66:cc"]
+          fingerprints:
+            - "9f:1d:37:d0:73:33:e4:24:41:ad:fd:1b:3e:89:66:cc"
       - attach_workspace:
           at: ~/
+      - install_awscli
       - run:
           name: Install dependencies
           command: |
-            pip install awscli
             apk add --update ansible
       - run:
           name: Configure Server
@@ -266,7 +264,6 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
-   
 
   run-migrations:
     docker:
@@ -410,9 +407,11 @@ jobs:
 
   cleanup:
       docker:
-        - image: cimg/python:3.10
+        - image: cimg/base:stable
       steps:
         - checkout
+        - install_nodejs
+        - install_awscli
         - run:
             name: Get old stack workflow id and remove stacks
             command: |
@@ -429,6 +428,23 @@ jobs:
                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               fi
             
+#            - run:
+#           name: Get old stack workflow id
+#           command: |
+#             export STACKS=($(aws cloudformation list-stacks \
+#                 --query "StackSummaries[*].StackName" \
+#                 --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+#             echo Stack names: "${STACKS[@]}"
+#             export OldWorkflowID=$(curl --insecure https://kvdb.io/159zKKqso4ouKpw7t7N1Wq/old_workflow_id)
+#             echo Old Workflow ID: $OldWorkflowID
+# - run:
+#           name: Send migration results to kvdb
+#           command: |
+#             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+#             then
+#              curl --insecure https://kvdb.io/159zKKqso4ouKpw7t7N1Wq/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+#             fi
+#       - revert-migrations
 
 workflows:
   default:
