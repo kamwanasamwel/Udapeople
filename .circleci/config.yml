@@ -267,6 +267,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - install_awscli 
       - run:
           command: |
             cd backend
